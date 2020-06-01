@@ -91,7 +91,7 @@ def language_default():
         else:
             lan = 'en'
     return lan
-        
+
 def show_restricted():
     global cpedata_out
     sout = get_restricted(cpedata_out)
@@ -144,7 +144,7 @@ def write_inifile():
     global inifile
     with open(inifile,'w') as configfile:
         iniconfig.write(configfile)
-        
+
 #------------------------------------------------------------------------------
 # get_restricted return a string with restricted commands in the cpe xml
 #     input: xml_str it is cpedata_out
@@ -193,7 +193,7 @@ def enable_restricted_web():
     cpedata_out = re.sub(b'(<PagePath>dboa\S+</PagePath>.\s+<Origin>\S+.\s+<Permissions>)0000',b'\g<1>2221',cpedata_out, 0, re.DOTALL)
     logger.log(lerr,_("Unlocked restricted web pages"))
     get_info(cpedata_out)    # update router status info
-    
+
 def enable_restricted_cli():
     global cpedata_out
     cpedata_out = re.sub(b'(<PagePath>clis\S+</PagePath>.\s+<Origin>\S+.\s+<Permissions>)0000',b'\g<1>2221',cpedata_out, 0, re.DOTALL)
@@ -208,8 +208,8 @@ def fix_dlinkddns():
     global cpedata_out
     cpedata_out = re.sub(b'<Name>dlinkdns.com</Name>',b'<Name>dlinkddns.com</Name>',cpedata_out, 0, re.DOTALL)
     logger.log(lerr,_("Fixed dlinkdns -> dlinkddns"))
-    get_info(cpedata_out)   # update router status info    
-    
+    get_info(cpedata_out)   # update router status info
+
 #------------------------------------------------------------------------------
 # get_info     setup router info textvariables
 #     input    xml_str   binary string, xml or cpe xml conf file
@@ -241,7 +241,7 @@ def get_info (xml_str):
     print("rtr_fwupgrade.get():" + rtr_fwupgrade.get()  + ":")
     if rtr_fwupgrade.get() == blank20 :
         rtr_fwupgrade.set('undef')
-        
+
     for i in xmlroot.findall(".//DeviceInfo/X_DLINK_customer_ID"):
         rtr_customerid.set(i.text)
 
@@ -253,7 +253,7 @@ def get_info (xml_str):
     print("rtr_fwupgrade.get():" + rtr_fwupgrade.get()  + ":")
     if rtr_fwdowngrade.get() == blank20 :
         rtr_fwdowngrade.set('undef')
-        
+
     for i in xmlroot.findall(".//IP/Interface/IPv4Address/IPAddress"):
         parent = i.getparent()
         granpa = parent.getparent()
@@ -283,11 +283,11 @@ def get_info (xml_str):
         rtr_fixddns.set(_('Fixed'))
     else:
         rtr_fixddns.set(_('Not Fixed'))
-        
+
 #------------------------------------------------------------------------------
 # get_passwords return a string text file with passwords xml string
 #     input    xml_str   binary string, xml or cpe xml conf file
-#     rturn    text string 
+#     rturn    text string
 #------------------------------------------------------------------------------
 def get_passwords (xml_str):
     mystr   = re.sub(b'<!-- DATA.*', b'', xml_str, 0, re.DOTALL)
@@ -295,7 +295,7 @@ def get_passwords (xml_str):
     xmlroot = xmltree.getroot()
 
     sout = '';
-    
+
     for s in  [ 'AuthPassword', 'Password' ]:
         for i in xmlroot.findall(".//" + s):
             parent  = i.getparent()
@@ -313,7 +313,7 @@ def get_passwords (xml_str):
     return(sout)
 
 #------------------------------------------------------------------------------
-# check_enable_menu - check and, if needed, enable menut items 
+# check_enable_menu - check and, if needed, enable menut items
 #------------------------------------------------------------------------------
 def check_enable_menu ():
     global loaded_bin
@@ -338,35 +338,35 @@ def check_enable_menu ():
     global rtr_fixddns
 
     print("check_enable_menu - loaded_bin, loaded_xml, loaded_cpe",loaded_bin,loaded_xml,loaded_cpe)
-    
+
     if ((loaded_bin == 1 ) or ((loaded_xml == 1) and (loaded_cpe == 1))):
-        filem.entryconfig(4, state = NORMAL)     # save as bin config
-        filem.entryconfig(5, state = NORMAL)     # save as xml config
-        filem.entryconfig(6, state = NORMAL)     # save as cpe xml config
-        editm.entryconfig(1, state = NORMAL)     # enable/unlock restricted webgui
-        editm.entryconfig(2, state = NORMAL)     # enable/unlock restricted CLI commands
-        editm.entryconfig(3, state = NORMAL)     # enable firmware downgrade        
-        editm.entryconfig(4, state = NORMAL)     # enable fix dlinkdns -> dlinkddns        
+        filem.entryconfig(3, state = NORMAL)     # save as bin config
+        filem.entryconfig(4, state = NORMAL)     # save as xml config
+        filem.entryconfig(5, state = NORMAL)     # save as cpe xml config
+        editm.entryconfig(0, state = NORMAL)     # enable/unlock restricted webgui
+        editm.entryconfig(1, state = NORMAL)     # enable/unlock restricted CLI commands
+        editm.entryconfig(2, state = NORMAL)     # enable firmware downgrade
+        editm.entryconfig(3, state = NORMAL)     # enable fix dlinkdns -> dlinkddns
     else:
-        filem.entryconfig(4, state = DISABLED)   # save as bin config 
-        filem.entryconfig(5, state = DISABLED)   # save as xml config
-        filem.entryconfig(6, state = DISABLED)   # save as cpe xml config
+        filem.entryconfig(3, state = DISABLED)   # save as bin config
+        filem.entryconfig(4, state = DISABLED)   # save as xml config
+        filem.entryconfig(5, state = DISABLED)   # save as cpe xml config
 
     if ((loaded_bin == 1) or (loaded_xml == 1) or (loaded_cpe == 1)):
-        infom.entryconfig(1, state = NORMAL)     # show passwords
-        infom.entryconfig(3, state = NORMAL)     # save passwords
+        infom.entryconfig(0, state = NORMAL)     # show passwords
+        infom.entryconfig(2, state = NORMAL)     # save passwords
     else:
-        infom.entryconfig(1, state = DISABLED)   # show passwords
-        infom.entryconfig(3, state = DISABLED)   # save passwords
+        infom.entryconfig(0, state = DISABLED)   # show passwords
+        infom.entryconfig(2, state = DISABLED)   # save passwords
 
     if ((loaded_bin == 1) or (loaded_cpe == 1)):
-        infom.entryconfig(2, state = NORMAL)     # show restricted commands
-        infom.entryconfig(4, state = NORMAL)     # save restricted commands
+        infom.entryconfig(1, state = NORMAL)     # show restricted commands
+        infom.entryconfig(3, state = NORMAL)     # save restricted commands
     else:
-        infom.entryconfig(2, state = DISABLED)   # show restricted commands
-        infom.entryconfig(4, state = DISABLED)   # save restricted commands
-        
-        
+        infom.entryconfig(1, state = DISABLED)   # show restricted commands
+        infom.entryconfig(3, state = DISABLED)   # save restricted commands
+
+
     if ((loaded_bin == 0) and (loaded_cpe == 0)):
         rtr_hwversion.set(blank20)
         rtr_manufacturer.set(blank20)
@@ -381,7 +381,7 @@ def check_enable_menu ():
         rtr_rwebgui.set(blank20)
         rtr_rcli.set(blank20)
         rtr_fixddns.set(blank20)
-        
+
     logger.log(level,_("check_enable_menu - done"))
 
 #------------------------------------------------------------------------------
@@ -404,15 +404,15 @@ def load_pems():
         logger.log(lerr,_("load_pems - error opening "), up_pem)
         popupmsg(_('Severe Error'), _("A severe error occoured in 'load_pems'.\nFile missing: ") + up_pem + "\n")
         conferror_quit(1)
-        
+
     load_pems_done = 1
     logger.log(ldebug,_("load_pems - done"))
     logger.log(ldebug,_("len 1: ") + str(len(pemconf_data)))
     logger.log(ldebug,_("len 2: ") + str(len(pemcpe_data)))
-    
+
 
 #------------------------------------------------------------------------------
-# about - 
+# about -
 #------------------------------------------------------------------------------
 def about():
     global versionstr
@@ -427,7 +427,7 @@ def about():
     popupmsg(_('About'), aboutstr + _("Program version: ") + versionstr + "\n")
 
 #------------------------------------------------------------------------------
-# enable_fw_upgrade   enable fw upgrade/downgrade 
+# enable_fw_upgrade   enable fw upgrade/downgrade
 #------------------------------------------------------------------------------
 def enable_fw_upgrade():
     global cpedata_out
@@ -461,11 +461,11 @@ def enable_fw_upgrade():
                              cpedata_out,
                              0,
                              re.DOTALL)
-        
-        
+
+
     get_info(cpedata_out)
     logger.log(lerr,_("enable_fw_upgrade - firmware upgrade/downgrade enabled"))
-    
+
 #------------------------------------------------------------------------------
 # load_config - load binary router configuration file - ok
 #------------------------------------------------------------------------------
@@ -497,8 +497,8 @@ def load_config(*args):
     if (name == ''):
         logger.log(ldebug,-("load_config - no file selected"))
         return()
-    
-    
+
+
     #Using try in case user types in unknown file or closes without choosing a file.
     try:
         with open(name,'rb') as f:
@@ -564,11 +564,11 @@ def load_config(*args):
         logger.log(lerr,_("load_config - error in finding hex data") + "\n")
         popupmsg(_('Severe Error'), _("A severe error occurred in 'load_config'.\nUnable to extract CPE XML configuration."))
         conferror_quit(2)
-    
+
     cpedata_bin = base64.b64decode(cpedata_hex)
-    
+
     key = pemcpe_data[0x20:0x30]
-    cipher = AES.new(key, AES.MODE_CBC, IV)    
+    cipher = AES.new(key, AES.MODE_CBC, IV)
     cpedata_out = cipher.decrypt(cpedata_bin)
     # Padding is a badly implemented PKCS#7 where 16 bytes padding is ignored,
     # so we have to check all previous bytes to see if it is valid.
@@ -588,7 +588,7 @@ def load_config(*args):
     get_info(cpedata_out)
     xml_src.set(name)
     cpexml_src.set(name)
-    
+
 #------------------------------------------------------------------------------
 # load_xmlconfig - load xml router configuration file - ok
 #------------------------------------------------------------------------------
@@ -614,7 +614,7 @@ def load_xmlconfig(*args):
     if (name == ''):
         logger.log(ldebug,_("load_xmlconfig - no file selected"))
         return()
-    
+
     #Using try in case user types in unknown file or closes without choosing a file.
     try:
         with open(name,'rb') as f:
@@ -639,9 +639,9 @@ def load_xmlconfig(*args):
     if (loaded_cpe == 0):
         cpexml_src.set('')
     check_enable_menu()
-    
+
 #------------------------------------------------------------------------------
-# load_cpexmlconfig - load cpe xml router configuration file - ok 
+# load_cpexmlconfig - load cpe xml router configuration file - ok
 #------------------------------------------------------------------------------
 def load_cpexmlconfig(*args):
     global defaultdir
@@ -665,7 +665,7 @@ def load_cpexmlconfig(*args):
     if (name == ''):
         logger.log(ldebug,-("load_cpexmlconfig - no file selected"))
         return()
-    
+
     #Using try in case user types in unknown file or closes without choosing a file.
     try:
         with open(name,'rb') as f:
@@ -691,7 +691,7 @@ def load_cpexmlconfig(*args):
     cpexml_src.set(name)
     get_info(cpedata_out)
     check_enable_menu()
-                                    
+
 #------------------------------------------------------------------------------
 # save_config - save router binary configuration file - ok
 #------------------------------------------------------------------------------
@@ -718,7 +718,7 @@ def save_config(*args):
     if padding_length != AES.block_size:
         padding_byte = padding_length.to_bytes(1, "big")
         cpedata_out += padding_byte * padding_length
-        
+
     cpedata_in  = cipher.encrypt(cpedata_out)
     cpedata_hex = base64.b64encode(cpedata_in)
     cpedata2_hex = re.sub(b"(.{72})", b"\\1\n", cpedata_hex, 0, re.DOTALL)
@@ -743,13 +743,13 @@ def save_config(*args):
     if padding_length != AES.block_size:
         padding_byte = padding_length.to_bytes(1, "big")
         data_out += padding_byte * padding_length
-        
+
     data_in = cipher.encrypt(data_out)
 
     # -------------------------------------------------------------------------
     # write binary file
     # -------------------------------------------------------------------------
-    
+
     name = asksaveasfilename(initialdir=defaultdir,
                              filetypes =((_("Binary Configuration File"), "*.bin"),(_("All Files"),"*.*")),
                              title =_("Binary Configuration File")
@@ -766,7 +766,7 @@ def save_config(*args):
         logger.log(ldebug,_("save_config - no file selected"))
         return()
 
-    
+
     #Using try in case user types in unknown file or closes without choosing a file.
     try:
         with open(name,'wb') as f:
@@ -797,7 +797,7 @@ def save_xmlconfig(*args):
     if (name == ''):
         logger.log(ldebug,_("save_xmlconfig - no file selected"))
         return()
-    
+
     #Using try in case user types in unknown file or closes without choosing a file.
     try:
         with open(name,'wb') as f:
@@ -820,7 +820,7 @@ def save_cpexmlconfig(*args):
                              title = _("Save CPE XML Configuration File")
                              )
 
-    
+
     try:
         logger.log(ldebug,_("save_cpexmlconfig - saving ") + name)
 
@@ -831,7 +831,7 @@ def save_cpexmlconfig(*args):
     if (name == ''):
         logger.log(ldebug,-("save_cpexmlconfig - no file selected"))
         return()
-    
+
     #Using try in case user types in unknown file or closes without choosing a file.
     try:
         with open(name,'wb') as f:
@@ -843,7 +843,7 @@ def save_cpexmlconfig(*args):
 
     defaultdir=os.path.dirname(name)
 
-                                
+
 #------------------------------------------------------------------------------
 # confquit - quit the program
 #------------------------------------------------------------------------------
@@ -854,7 +854,7 @@ def confquit(*args):
 def conferror_quit(err):
     logger.log(lerr,_("Exit with error ") + err)
     sys.exit(err)
-    
+
 #------------------------------------------------------------------------------
 # not_yet - print in the console the not implemented yet message
 #------------------------------------------------------------------------------
@@ -982,47 +982,47 @@ class RouterInfo:
         global rtr_rwebgui
         global rtr_rcli
         global rtr_fixddns
-        
+
         self.frame = frame
         ttk.Label(self.frame, text=_('Hardware Version: ')).grid(column=0, row=1, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_hwversion).grid(column=1, row=1, sticky=W)
 
         ttk.Label(self.frame, text=_('Manufacturer: ')).grid(column=0, row=2, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_manufacturer).grid(column=1, row=2, sticky=W)
-        
+
         ttk.Label(self.frame, text=_('Model Name: ')).grid(column=0, row=3, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_modelname).grid(column=1, row=3, sticky=W)
 
         ttk.Label(self.frame, text=_('Router customer ID: ')).grid(column=0, row=4, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_customerid).grid(column=1, row=4, sticky=W)
-        
+
         ttk.Label(self.frame, text=_('Serial Number: ')).grid(column=0, row=5, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_serial).grid(column=1, row=5, sticky=W)
 
         ttk.Label(self.frame, text=_('Router IP (bridge interface): ')).grid(column=0, row=6, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_ip).grid(column=1, row=6, sticky=W)
-        
+
         ttk.Label(self.frame, text=_('Router Net Mask (bridge interface): ')).grid(column=0, row=7, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_mask).grid(column=1, row=7, sticky=W)
 
         ttk.Label(self.frame, text=_('BSD GUI visible: ')).grid(column=0, row=8, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_bsdgui).grid(column=1, row=8, sticky=W)
-        
+
         ttk.Label(self.frame, text=_('Restricted web GUI: ')).grid(column=0, row=9, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_rwebgui).grid(column=1, row=9, sticky=W)
 
         ttk.Label(self.frame, text=_('Restricted CLI commands: ')).grid(column=0, row=10, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_rcli).grid(column=1, row=10, sticky=W)
-        
+
         ttk.Label(self.frame, text=_('Firmware upgrade enabled: ')).grid(column=0, row=11, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_fwupgrade).grid(column=1, row=11, sticky=W)
-        
+
         ttk.Label(self.frame, text=_('Firmware downgrade enabled: ')).grid(column=0, row=12, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_fwdowngrade).grid(column=1, row=12, sticky=W)
-        
+
         ttk.Label(self.frame, text=_('Fix dlinkdns -> dlinkddns: ')).grid(column=0, row=13, sticky=W)
         ttk.Label(self.frame, textvariable=rtr_fixddns).grid(column=1, row=13, sticky=W)
-        
+
 class ThirdUi:
 
     def __init__(self, frame):
@@ -1080,7 +1080,7 @@ class App:
         filem.add_command(label = _('Save configuration file (BIN format)'),        command = save_config, state = DISABLED)
         filem.add_command(label = _('Save configuration file (XML format)'),        command = save_xmlconfig, state = DISABLED)
         filem.add_command(label = _('Save CPE configuration file (XML format)'),    command = save_cpexmlconfig, state = DISABLED)
-        filem.add_command(label = _('Exit'),                                        command = confquit)        
+        filem.add_command(label = _('Exit'),                                        command = confquit)
         menubar.add_cascade(label = _('File'), menu = filem)
 
         infom = Menu(menubar)
@@ -1095,25 +1095,25 @@ class App:
         editm.add_command(label = _('Unlock restricted web GUI'),         command = enable_restricted_web, state = DISABLED)
         editm.add_command(label = _('Unlock restricted CLI commands'),    command = enable_restricted_cli, state = DISABLED)
         editm.add_command(label = _('Enable firmware upgrade/downgrade'), command = enable_fw_upgrade, state = DISABLED)
-        editm.add_command(label = _('Fix dlinkdns -> dlinkddns'),         command = fix_dlinkddns, state = DISABLED)        
-        editm.add_command(label = _('Settings'),                          command = edit_preference)        
+        editm.add_command(label = _('Fix dlinkdns -> dlinkddns'),         command = fix_dlinkddns, state = DISABLED)
+        editm.add_command(label = _('Settings'),                          command = edit_preference)
         menubar.add_cascade(label = _('Edit'), menu = editm)
 
-        
+
     def quit(self, *args):
         #self.clock.stop()
         self.root.destroy()
 # def popup_bonus():
 #     win = tk.Toplevel()
 #     win.wm_title("Window")
-    
+
 #     l = tk.Label(win, text="Input")
 #     l.grid(row=0, column=0)
-    
+
 #     b = ttk.Button(win, text="OK", command=win.destroy)
 #     b.grid(row=1, column=0)
-                            
-        
+
+
 def popupmsg(title,msg):
     popup = tk.Toplevel()
     popup.wm_title(title)
@@ -1131,10 +1131,10 @@ def popupmsg(title,msg):
     # Gets both half the screen width/height and window width/height
     positionRight = int(popup.winfo_screenwidth()/2 - windowWidth/2) - 300 + 100
     positionDown = int(popup.winfo_screenheight()/2 - windowHeight/2) + 100
-    
+
     # Positions the window in the center of the page.
     popup.geometry("+{}+{}".format(positionRight, positionDown))
-    
+
 
 def edit_preference():
     global iniconfig
@@ -1152,7 +1152,7 @@ def edit_preference():
         if os.path.isdir((mydir + '/locale/' + i)):
             logger.log (ldebug, _("Available language: ") + i)
             avail_languages.append(i)
-    
+
     popup = tk.Toplevel()
     popup.wm_title('Edit Preference')
     popup.columnconfigure(0, weight=1, minsize=150, pad=15)
@@ -1172,7 +1172,7 @@ def edit_preference():
         else:
             iniconfig['global'] = {'PreferenceInProgramFolder': 'no'}
         prefinprog.set(iniconfig['global']['PreferenceInProgramFolder'])
-    
+
     if (lastloc.get() == 'yes'):
         dirloc.set(defaultdir)
 
@@ -1182,7 +1182,7 @@ def edit_preference():
     except:
         iniconfig['global'] = {'Language': language_default()}
         language.set(iniconfig['global']['Language'])
-    
+
     c0 = ttk.Checkbutton(popup, text=_("Print debugging info"),
                          variable=dbginfo, onvalue='yes', offvalue='no')
     c0.grid(row=0, column=0, columnspan=2, padx=3, pady=0, sticky='W')
@@ -1193,7 +1193,7 @@ def edit_preference():
 
     l2 = ttk.Label(popup, text=_("Save/Load default folder"))
     l2.grid(row=2, column=0, padx=3, pady=0, sticky='W')
-    
+
     e2 = ttk.Entry(popup, textvariable=dirloc, width=len(dirloc.get()) + 15, state=DISABLED)
     e2.grid(row=2, column=1, padx=3, pady=0, sticky='W')
 
@@ -1201,20 +1201,20 @@ def edit_preference():
                          variable=prefinprog, onvalue='yes', offvalue='no')
     c3.grid(row=3, column=0, columnspan=2, padx=3, pady=0, sticky='W')
 
-    
+
     l4 = ttk.Label(popup, text=_("Default Language (restart needed after change)"))
     l4.grid(row=4, column=0, padx=3, pady=0, sticky='W')
-    
+
     cb4 = ttk.Combobox(popup, textvariable=language, value=avail_languages, state='readonly', width=5)
     cb4.grid(row=4, column=1, padx=3, pady=0, sticky='W')
-    
+
     bend = ttk.Button(popup, text=_("Cancel"), command = popup.destroy)
     bend.grid(row=5,column=0, padx=30, pady=3, sticky='W')
 
     bendb = ttk.Button(popup, text=_("Save"), command = save_preference)
     bendb.grid(row=5,column=1, padx=30, pady=3, sticky='E')
 
-	
+
     # Gets the requested values of the height and widht.
     windowWidth = popup.winfo_reqwidth()
     windowHeight = popup.winfo_reqheight()
@@ -1223,7 +1223,7 @@ def edit_preference():
     # Gets both half the screen width/height and window width/height
     positionRight = int(popup.winfo_screenwidth()/2 - windowWidth/2) - 300 + 100
     positionDown = int(popup.winfo_screenheight()/2 - windowHeight/2) + 100
-    
+
     # Positions the window in the center of the page.
     popup.geometry("+{}+{}".format(positionRight, positionDown))
     print("dbginfo: " + dbginfo.get())
@@ -1235,13 +1235,13 @@ def edit_pref_dirloc():
     global e2
     global defaultdir
     global prefinprog
-	
+
     if (lastloc.get() == 'yes'):
         e2.configure(state=DISABLED)
         dirloc.set(defaultdir)
     else:
         e2.configure(state=NORMAL)
-		 
+
 def save_preference():
     global popup
     global iniconfig
@@ -1250,7 +1250,7 @@ def save_preference():
     global dirloc
     global inifile
     global language
-    
+
     iniconfig['global']['LogDebug']=dbginfo.get()
     iniconfig['global']['SaveLoadDirLastLocation']=lastloc.get()
     iniconfig['global']['PreferenceInProgramFolder']=prefinprog.get()
@@ -1263,7 +1263,7 @@ def save_preference():
     else:
         #logging.basicConfig(level=logging.INFO)
         logger.setLevel(logging.INFO)
-        
+
     if iniconfig['global']['PreferenceInProgramFolder'] == 'yes':
         inifile = proginifile
         if os.path.isfile(userinifile):
@@ -1280,7 +1280,7 @@ def save_preference():
                 os.remove(proginifile)
             except:
                 logger.log(lerr,_("Error removing ") + proginifile)
-                
+
     if (os.path.isdir(dirloc.get())):
         iniconfig['global']['SaveLoadDir']=dirloc.get()
         popup.destroy()
@@ -1288,7 +1288,7 @@ def save_preference():
     else:
         popupmsg(_("Folder name error"),_("Folder not available: ") + dirloc.get())
 
-                
+
 def save_defaultdir():
     global iniconfig
     global defaultdir
@@ -1296,7 +1296,7 @@ def save_defaultdir():
        (iniconfig['global']['SaveLoadDir'] != defaultdir):
        iniconfig['global']['SaveLoadDir'] = defaultdir
        write_inifile()
-                                
+
 def print_passwords():
     global data_out
     global cpedata_out
@@ -1311,7 +1311,7 @@ def print_passwords():
         logger.log(lwarn,get_passwords(cpedata_out))
     else:
         logger.log(lerr,"\n"+ _("---- CPE configuration file not loaded ----"))
-        
+
 #-----------------------------------------------------------------------------------------------
 # save_passwords  - save passwords to a text file
 #-----------------------------------------------------------------------------------------------
@@ -1319,7 +1319,7 @@ def save_passwords():
     global data_out
     global cpedata_out
     global defaultdir
-    
+
     pass_str = ''
     if (('data_out' in globals()) and ((loaded_bin == 1) or (loaded_xml == 1))):
         pass_str = pass_str + _("---- Passwords from main configuration file ----") + "\n\n"
@@ -1332,7 +1332,7 @@ def save_passwords():
         pass_str = pass_str + get_passwords(cpedata_out)
     else:
         pass_str = pass_str + "\n" + _("---- CPE configuration file not loaded ----") + "\n"
-        
+
     name = asksaveasfilename(initialdir=defaultdir,
                              filetypes =((_("Text password file"), "*.txt"),(_("All Files"),"*.*")),
                              title = _("Choose a file")
@@ -1348,7 +1348,7 @@ def save_passwords():
 
     defaultdir=os.path.dirname(name)
 
-        
+
 #-----------------------------------------------------------------------------------------------
 # Main Program
 #-----------------------------------------------------------------------------------------------
@@ -1374,7 +1374,7 @@ if iniconfig['global']['LogDebug'] == 'yes':
     logging.basicConfig(level=logging.DEBUG)
 else:
     logging.basicConfig(level=logging.INFO)
-    
+
 root = tk.Tk()
 
 xml_src          = tk.StringVar()     # file loaded with main xml configuration
